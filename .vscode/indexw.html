@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Museo Interactivo y Virtual de México</title>
+    <style>
+        /* Paleta de colores e identidades visuales inspiradas en la imagen */
+        :root {
+            --primary-color: #0B4626; /* Verde oscuro elegante de tu referencia */
+            --primary-light: #145c34;
+            --accent-color: #D4AF37; /* Toque dorado para detalles */
+            --bg-color: #F4F1EA; /* Fondo claro crema/madera sutil */
+            --card-bg: #FFFFFF;
+            --text-dark: #2C302E;
+            --text-light: #FFFFFF;
+            --font-sans: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            --font-serif: 'Georgia', 'Times New Roman', serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: var(--font-sans);
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Pantalla de Bienvenida */
+        #bienvenida {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 25%, rgba(212,175,55,0.18), transparent 28%),
+                        radial-gradient(circle at 80% 20%, rgba(255,255,255,0.15), transparent 22%),
+                        linear-gradient(135deg, #081e14 0%, #113827 45%, #1f6a43 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: var(--text-light);
+            z-index: 9999;
+            padding: 20px;
+            transition: opacity 0.5s ease, visibility 0.5s;
+            overflow: hidden;
+            animation: welcomeGlow 14s ease-in-out infinite alternate;
+        }
+
+        #bienvenida::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.08), transparent 30%);
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        #bienvenida h1 {
+            font-family: var(--font-serif);
+            font-size: 3.8rem;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            text-shadow: 0 16px 30px rgba(0,0,0,0.25);
+        }
+
+        #bienvenida p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin-bottom: 40px;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+
+        #bienvenida button {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            border: 2px solid var(--text-light);
+            border-radius: 30px;
+            cursor: pointer;
+            background: transparent;
+            color: var(--text-light);
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        #bienvenida button:hover {
+            background: var(--text-light);
+            color: var(--primary-color);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+
+        /* Navegación / Encabezado superior */
+        nav {
+            background-color: var(--primary-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 4%;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.95rem;
+            opacity: 0.85;
+            transition: opacity 0.2s;
+        }
+
+        .nav-links a:hover, .nav-links a.active {
+            opacity: 1;
+            font-weight: 600;
+        }
+
+        .nav-logo {
+            color: var(--text-light);
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-container {
+            display: flex;
+            align-items: center;
+            position: relative;
+            width: 300px;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 10px 42px 10px 18px;
+            border-radius: 24px;
+            border: none;
+            background-color: rgba(255, 255, 255, 0.95);
+            font-size: 0.95rem;
+            outline: none;
+            transition: box-shadow 0.25s ease, transform 0.25s ease;
+        }
+
+        .search-container input:focus {
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.18);
+            transform: translateY(-1px);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 10px;
+            width: 34px;
+            height: 34px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: #444;
+            cursor: pointer;
+            border: none;
+            background: rgba(255,255,255,0.92);
+            border-radius: 50%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+            transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+        }
+
+        .search-icon:hover {
+            transform: scale(1.05);
+            background: var(--text-light);
+            color: var(--primary-color);
+        }
+
+        .search-feedback {
+            margin-top: 12px;
+            text-align: center;
+            color: #514d4a;
+            opacity: 0.95;
+            font-size: 0.95rem;
+            transition: opacity 0.25s ease;
+        }
+
+        .btn-contact {
+            background-color: var(--text-light);
+            color: var(--primary-color);
+            border: none;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s, transform 0.2s ease;
+        }
+
+        .btn-showall {
+            background-color: transparent;
+            color: var(--text-light);
+            border: 1px solid rgba(255,255,255,0.55);
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s, transform 0.2s ease, border-color 0.2s;
+            margin-left: 10px;
+        }
+
+        .btn-showall:hover {
+            background-color: rgba(255,255,255,0.18);
+            border-color: rgba(255,255,255,0.9);
+            transform: translateY(-2px);
+        }
+
+        .btn-contact:hover {
+            background-color: #f0f0f0;
+            transform: translateY(-2px);
+        }
+
+        /* Hero / Sección de la Cita de Picasso */
+        .hero {
+            position: relative;
+            background: linear-gradient(180deg, rgba(4, 36, 22, 0.65), rgba(9, 44, 29, 0.82)), url('https://images.unsplash.com/photo-1580136579312-94651dfd596d?auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+            padding: 110px 10% 150px 10%;
+            text-align: left;
+            color: var(--text-light);
+            overflow: hidden;
+            animation: heroGlow 16s ease-in-out infinite alternate;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(212,175,55,0.12), transparent 42%), radial-gradient(circle at 75% 35%, rgba(255,255,255,0.06), transparent 18%);
+            pointer-events: none;
+        }
+
+        .hero-content {
+            max-width: 900px;
+            opacity: 0;
+            transform: translateX(-20px);
+            animation: heroFade 0.9s ease-out 0.25s forwards;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-family: var(--font-serif);
+            font-size: 2.8rem;
+            line-height: 1.3;
+            margin-bottom: 20px;
+            font-weight: normal;
+        }
+
+        .hero .author {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            font-style: italic;
+        }
+
+        @keyframes heroGlow {
+            0% { background-position: center top; }
+            50% { background-position: center 10%; }
+            100% { background-position: center 0%; }
+        }
+
+        @keyframes welcomeGlow {
+            0% { transform: scale(1); }
+            100% { transform: scale(1.02); }
+        }
+
+        @keyframes heroFade {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Divisor Curvo Inferior */
+        .wave-separator {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            overflow: hidden;
+            line-height: 0;
+        }
+
+        .wave-separator svg {
+            position: relative;
+            display: block;
+            width: calc(100% + 1.3px);
+            height: 50px;
+        }
+
+        .wave-separator .shape-fill {
+            fill: var(--bg-color);
+        }
+
+        @keyframes heroFade {
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes cardEntrance {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Galería principal del Museo */
+        .main-content {
+            padding: 40px 4%;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            text-align: center;
+            font-family: var(--font-serif);
+            font-size: 2rem;
+            margin-bottom: 35px;
+            color: var(--primary-color);
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 60px;
+            height: 3px;
+            background-color: var(--accent-color);
+        }
+
+        .galeria {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            padding-bottom: 40px;
+        }
+
+        .tarjeta {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: cardEntrance 0.6s ease forwards;
+        }
+
+        .tarjeta:nth-child(1) { animation-delay: 0.08s; }
+        .tarjeta:nth-child(2) { animation-delay: 0.14s; }
+        .tarjeta:nth-child(3) { animation-delay: 0.20s; }
+        .tarjeta:nth-child(4) { animation-delay: 0.26s; }
+        .tarjeta:nth-child(5) { animation-delay: 0.32s; }
+        .tarjeta:nth-child(6) { animation-delay: 0.38s; }
+        .tarjeta:nth-child(7) { animation-delay: 0.44s; }
+
+        .tarjeta:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+        }
+
+        .tarjeta-img-wrapper {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+        }
+
+        .tarjeta img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .tarjeta:hover img {
+            transform: scale(1.05);
+        }
+
+        .tarjeta-info {
+            padding: 20px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tarjeta h3 {
+            color: var(--primary-color);
+            font-size: 1.25rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tarjeta p {
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Salas de Exhibición Individuales */
+        .sala {
+            display: none;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+            margin-top: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sala-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+
+        .sala h2 {
+            font-family: var(--font-serif);
+            color: var(--primary-color);
+            font-size: 2.2rem;
+        }
+
+        .sala-meta-desc {
+            font-size: 1.1rem;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 30px;
+            max-width: 800px;
+        }
+
+        .sala-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .sala-grid {
+                grid-template-columns: 1fr;
+            }
+            nav {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            .search-container {
+                width: 100%;
+            }
+        }
+
+        .exhibits-list {
+            list-style: none;
+        }
+
+        .exhibits-list li {
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            background-color: #F8F9FA;
+            border-left: 4px solid var(--primary-color);
+            border-radius: 0 8px 8px 0;
+            font-size: 1.05rem;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+
+        .exhibits-list li:hover {
+            background-color: #EDEFEF;
+        }
+
+        .sala-visual {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            height: 100%;
+            min-height: 250px;
+        }
+
+        .sala-visual img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .btn-volver {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 25px;
+            border: none;
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 30px;
+            transition: background 0.2s, transform 0.2s;
+        }
+
+        .btn-volver:hover {
+            background-color: var(--primary-light);
+            transform: translateX(-3px);
+        }
+
+        /* Pie de Página */
+        footer {
+            background-color: var(--primary-color);
+            color: var(--text-light);
+            text-align: center;
+            padding: 25px;
+            margin-top: 60px;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            border-top: 3px solid var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+
+<div id="bienvenida">
+    <h1>Museo Interactivo de México</h1>
+    <p>
+        Bienvenido a un recorrido virtual de vanguardia donde descubrirás la historia, 
+        la gastronomía, las tradiciones, el arte y las civilizaciones que han formado 
+        la identidad cultural de México.
+    </p>
+    <button onclick="entrarMuseo()">Iniciar Recorrido Virtual</button>
+</div>
+
+<nav>
+    <div class="nav-links">
+        <a href="#" class="active" onclick="volver()">Inicio</a>
+        <a href="#">Noticias</a>
+    </div>
+    
+    <div class="nav-logo">
+        <span>Museo Virtual de México</span>
+    </div>
+    
+    <div class="search-container">
+        <input id="searchInput" type="text" placeholder="Buscar salas, piezas, historia..." onkeydown="if(event.key==='Enter'){buscarMuseo()}">
+        <button type="button" class="search-icon" onclick="buscarMuseo()" aria-label="Buscar">Buscar</button>
+    </div>
+    
+    <button class="btn btn-showall" onclick="mostrarTodo()">Mostrar todo</button>
+    <button class="btn-contact">Contáctenos</button>
+</nav>
+<div id="searchFeedback" class="search-feedback oculto"></div>
+
+<section class="hero" id="hero-section">
+    <div class="hero-content">
+        <h1>"Las experiencias más enriquecedoras no se pueden ver ni tocar, sino que se sienten con el alma."</h1>
+        <p class="author">— Pablo Picasso</p>
+    </div>
+    
+    <div class="wave-separator">
+        <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" preserveAspectRatio="none">
+            <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,42.4V0Z" class="shape-fill"></path>
+        </svg>
+    </div>
+</section>
+
+<main class="main-content">
+    
+    <div id="museo-galeria">
+        <h2 class="section-title">Explora las Salas Culturales</h2>
+        
+        <section class="galeria">
+            <div class="tarjeta" onclick="abrirSala('piramides')">
+                <div class="tarjeta-img-wrapper">
+                    <img src="images/Piramide del sol.jpg" alt="Pirámides">
+                </div>
+                <div class="tarjeta-info">
+                    <h3>Pirámides</h3>
+                    <p>Descubre los misterios y la arquitectura monumental de las grandes civilizaciones prehispánicas.</p>
+                </div>
+            </div>
+
+            <div class="tarjeta" onclick="abrirSala('calendario')">
+                <div class="tarjeta-img-wrapper">
+                    <img src="images/Piedradelsol.webp" alt="Piedra del Sol">
+                </div>
+                <div class="tarjeta-info">
+                    <h3>Piedra del Sol</h3>
+                    <p>Explora la cosmovisión, el tiempo y el arte astronómico reflejado en el gran calendario Mexica.</p>
+                </div>
+            </div>
+
+            <div class="tarjeta" onclick="abrirSala('artesanias')">
+                <div class="tarjeta-img-wrapper">
+                    <img src="images/Artesanias.webp" alt="Artesanías">
+                </div>
+                <div class="tarjeta-info">
+                    <h3>Artesanías</h3>
+                    <p>Un viaje por la explosión de color de los alebrijes, el misticismo del barro negro y los textiles únicos.</p>
+                </div>
+            </div>
+
+            <div class="tarjeta" onclick="abrirSala('talavera')">
+                <div class="tarjeta-img-wrapper">
+                    <img src="images/talavera.jpg" alt="Talavera">
+                </div>
+                <div class="tarjeta-info">
+                    <h3>Talavera</h3>
+                    <p>Admira la intrincada tradición cerámica poblana, herencia colonial con sello de identidad nacional.</p>
+                </div>
+            </div>
+
+            <div class="tarjeta" onclick="abrirSala('trajes')">
+                <div class="tarjeta-img-wrapper">
+                    <img src="images/trajes.jpg" alt="Trajes Típicos">
+                </div>
+                <div class="tarjeta-info">
+                    <h3>Trajes Típicos</h3>
+                    <p>Viste tu imaginación con la riqueza de hilos, significados e historias de las indumentarias regionales.</p>
+                </div>
+            </div>
+
+            <div class="tarjeta" onclick="abrirSala('mariachi')">
+                <div class="tarjeta-img-wrapper">
+                    <img src="images/mariachi.jpg" alt="Mariachi">
+                </div>
+                <div class="tarjeta-info">
+                    <h3>Mariachi</h3>
+                    <p>Siente la pasión y acordes de la música tradicional, declarada Patrimonio de la Humanidad.</p>
+                </div>
+            </div>
+
+            <div class="tarjeta" onclick="abrirSala('gastronomia')">
+                <div class="tarjeta-img-wrapper">
+                    <img src="images/comida.webp" alt="Gastronomía">
+                </div>
+                <div class="tarjeta-info">
+                    <h3>Gastronomía</h3>
+                    <p>Deleita tus sentidos con los sabores ancestrales y complejos del mole, tamales y platillos icónicos.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <section id="piramides" class="sala">
+        <div class="sala-header">
+            <div>
+                <h2>Pirámides</h2>
+                <p class="sala-meta-desc">Viaja a lo más profundo de las grandes construcciones prehispánicas y conoce los secretos arquitectónicos de Teotihuacán, Chichén Itzá y Monte Albán.</p>
+            </div>
+        </div>
+        <div class="sala-grid">
+            <div>
+                <ul class="exhibits-list">
+                    <li>La Gran Pirámide de Cholula</li>
+                    <li>El Templo de Kukulkán</li>
+                    <li>Las Escalinatas Sagradas</li>
+                </ul>
+            </div>
+            <div class="sala-visual">
+                <img src="images/Piramide del sol.jpg" alt="Pirámides Mexicanas">
+            </div>
+        </div>
+        <button class="btn-volver" onclick="volver()">Volver a la Galería</button>
+    </section>
+
+    <section id="calendario" class="sala">
+        <div class="sala-header">
+            <div>
+                <h2>Piedra del Sol</h2>
+                <p class="sala-meta-desc">Conoce la cosmovisión mexica, los signos astronómicos y el valor cultural del calendario solar más famoso del mundo.</p>
+            </div>
+        </div>
+        <div class="sala-grid">
+            <div>
+                <ul class="exhibits-list">
+                    <li>El ciclo de los cinco soles</li>
+                    <li>Los glifos y su significado</li>
+                    <li>El tiempo en la antigua ciudad de México-Tenochtitlán</li>
+                </ul>
+            </div>
+            <div class="sala-visual">
+                <img src="images/Piedradelsol.webp" alt="Piedra del Sol">
+            </div>
+        </div>
+        <button class="btn-volver" onclick="volver()">← Volver a la Galería</button>
+    </section>
+
+    <section id="artesanias" class="sala">
+        <div class="sala-header">
+            <div>
+                <h2>Artesanías</h2>
+                <p class="sala-meta-desc">Descubre la riqueza de los oficios tradicionales: alebrijes, barro negro, bordados y piezas llenas de color y simbolismo.</p>
+            </div>
+        </div>
+        <div class="sala-grid">
+            <div>
+                <ul class="exhibits-list">
+                    <li>Alebrijes de Oaxaca</li>
+                    <li>Textiles chiapanecos</li>
+                    <li>Cerámica de barro negro</li>
+                </ul>
+            </div>
+            <div class="sala-visual">
+                <img src="images/Artesanias.webp" alt="Artesanías Mexicanas">
+            </div>
+        </div>
+        <button class="btn-volver" onclick="volver()">← Volver a la Galería</button>
+    </section>
+
+    <section id="talavera" class="sala">
+        <div class="sala-header">
+            <div>
+                <h2>Talavera</h2>
+                <p class="sala-meta-desc">Explora la tradición cerámica poblana, sus patrones, su esmalte y cómo se fusionan arte y técnica en cada pieza.</p>
+            </div>
+        </div>
+        <div class="sala-grid">
+            <div>
+                <ul class="exhibits-list">
+                    <li>Azulejos y vajillas</li>
+                    <li>Iconografía barroca</li>
+                    <li>Proceso de cocción y esmalte</li>
+                </ul>
+            </div>
+            <div class="sala-visual">
+                <img src="images/talavera.jpg" alt="Talavera Poblana">
+            </div>
+        </div>
+        <button class="btn-volver" onclick="volver()">← Volver a la Galería</button>
+    </section>
+
+    <section id="trajes" class="sala">
+        <div class="sala-header">
+            <div>
+                <h2>Trajes Típicos</h2>
+                <p class="sala-meta-desc">Admira los textiles regionales, bordados y el simbolismo de los trajes tradicionales de México en un recorrido visual.</p>
+            </div>
+        </div>
+        <div class="sala-grid">
+            <div>
+                <ul class="exhibits-list">
+                    <li>Traje de charro</li>
+                    <li>Huipil y rebozo</li>
+                    <li>Vestidos de fiesta regionales</li>
+                </ul>
+            </div>
+            <div class="sala-visual">
+                <img src="images/trajes.jpg" alt="Trajes Típicos Mexicanos">
+            </div>
+        </div>
+        <button class="btn-volver" onclick="volver()">← Volver a la Galería</button>
+    </section>
+
+    <section id="mariachi" class="sala">
+        <div class="sala-header">
+            <div>
+                <h2>Mariachi</h2>
+                <p class="sala-meta-desc">Siente el ritmo, los instrumentos y la historia detrás del mariachi como ícono musical mexicano.</p>
+            </div>
+        </div>
+        <div class="sala-grid">
+            <div>
+                <ul class="exhibits-list">
+                    <li>Orígenes del mariachi</li>
+                    <li>Instrumentos tradicionales</li>
+                    <li>Canciones emblemáticas</li>
+                </ul>
+            </div>
+            <div class="sala-visual">
+                <img src="images/mariachi.jpg" alt="Mariachi">
+            </div>
+        </div>
+        <button class="btn-volver" onclick="volver()">← Volver a la Galería</button>
+    </section>
+
+    <section id="gastronomia" class="sala">
+        <div class="sala-header">
+            <div>
+                <h2>Gastronomía</h2>
+                <p class="sala-meta-desc">Saborea la diversidad culinaria mexicana: mole, salsas, tamales, tacos y el legado gastronómico de cada región.</p>
+            </div>
+        </div>
+        <div class="sala-grid">
+            <div>
+                <ul class="exhibits-list">
+                    <li>Mole poblano y poblano</li>
+                    <li>Chiles y maíz</li>
+                    <li>Postres tradicionales</li>
+                </ul>
+            </div>
+            <div class="sala-visual">
+                <img src="images/comida.webp" alt="Gastronomía Mexicana">
+            </div>
+        </div>
+        <button class="btn-volver" onclick="volver()">← Volver a la Galería</button>
+    </section>
+</main>
+
+<footer>
+    © 2026 Museo Virtual de México · Un recorrido cultural interactivo
+</footer>
+
+<script>
+    function entrarMuseo() {
+        const bienvenida = document.getElementById('bienvenida');
+        bienvenida.style.opacity = '0';
+        bienvenida.style.visibility = 'hidden';
+        setTimeout(() => {
+            bienvenida.style.display = 'none';
+        }, 500);
+    }
+
+    function buscarMuseo() {
+        const query = document.getElementById('searchInput').value.trim().toLowerCase();
+        const tarjetas = document.querySelectorAll('.tarjeta');
+        let matches = 0;
+
+        tarjetas.forEach((tarjeta) => {
+            const text = tarjeta.innerText.toLowerCase();
+            const visible = query === '' || text.includes(query);
+            tarjeta.style.display = visible ? 'flex' : 'none';
+            if (visible) matches++;
+        });
+
+        const feedback = document.getElementById('searchFeedback');
+        if (query !== '' && matches === 0) {
+            feedback.classList.remove('oculto');
+            feedback.textContent = `No se encontraron resultados para "${query}".`;
+        } else {
+            feedback.classList.add('oculto');
+        }
+    }
+
+    function abrirSala(id) {
+        const galeria = document.getElementById('museo-galeria');
+        galeria.style.display = 'none';
+        document.querySelectorAll('.sala').forEach(sala => sala.style.display = 'none');
+        const salaSeleccionada = document.getElementById(id);
+        if (salaSeleccionada) {
+            salaSeleccionada.style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+
+    function mostrarTodo() {
+        document.getElementById('searchInput').value = '';
+        buscarMuseo();
+        const feedback = document.getElementById('searchFeedback');
+        feedback.classList.add('oculto');
+    }
+
+    function volver() {
+        document.querySelectorAll('.sala').forEach(sala => sala.style.display = 'none');
+        const galeria = document.getElementById('museo-galeria');
+        galeria.style.display = 'block';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+</script>
+</body>
+</html>
