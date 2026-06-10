@@ -545,7 +545,14 @@
             letter-spacing: 0.5px;
             border-top: 3px solid var(--accent-color);
         }
-    </style>
+    
+.modal{display:none;position:fixed;z-index:9999;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,.85);}
+.modal-content{background:#fff;width:85%;max-width:900px;margin:30px auto;padding:25px;border-radius:15px;text-align:center;}
+.modal-img{width:100%;max-height:450px;object-fit:cover;border-radius:12px;margin:15px 0;}
+.cerrar-modal{float:right;font-size:35px;cursor:pointer;}
+.exhibits-list li{cursor:pointer;}
+
+</style>
 </head>
 <body>
 
@@ -680,9 +687,9 @@
         <div class="sala-grid">
             <div>
                 <ul class="exhibits-list">
-                    <li>La Gran Pirámide de Cholula</li>
-                    <li>El Templo de Kukulkán</li>
-                    <li>Las Escalinatas Sagradas</li>
+                    <li onclick="mostrarInfo('cholula')">La Gran Pirámide de Cholula</li>
+                    <li onclick="mostrarInfo('kukulkan')">El Templo de Kukulkán</li>
+                    <li onclick="mostrarInfo('escalinatas')">Las Escalinatas Sagradas</li>
                 </ul>
             </div>
             <div class="sala-visual">
@@ -702,9 +709,9 @@
         <div class="sala-grid">
             <div>
                 <ul class="exhibits-list">
-                    <li>El ciclo de los cinco soles</li>
-                    <li>Los glifos y su significado</li>
-                    <li>El tiempo en la antigua ciudad de México-Tenochtitlán</li>
+                    <li onclick="mostrarInfo('cincoSoles')">El ciclo de los cinco soles</li>
+                    <li onclick="mostrarInfo('glifos')">Los glifos y su significado</li>
+                    <li onclick="mostrarInfo('tenochtitlan')">El tiempo en la antigua ciudad de México-Tenochtitlán</li>
                 </ul>
             </div>
             <div class="sala-visual">
@@ -724,9 +731,9 @@
         <div class="sala-grid">
             <div>
                 <ul class="exhibits-list">
-                    <li>Alebrijes de Oaxaca</li>
-                    <li>Textiles chiapanecos</li>
-                    <li>Cerámica de barro negro</li>
+                    <li onclick="mostrarInfo('alebrijes')">Alebrijes de Oaxaca</li>
+                    <li onclick="mostrarInfo('textiles')">Textiles chiapanecos</li>
+                    <li onclick="mostrarInfo('barroNegro')">Cerámica de barro negro</li>
                 </ul>
             </div>
             <div class="sala-visual">
@@ -746,9 +753,9 @@
         <div class="sala-grid">
             <div>
                 <ul class="exhibits-list">
-                    <li>Azulejos y vajillas</li>
-                    <li>Iconografía barroca</li>
-                    <li>Proceso de cocción y esmalte</li>
+                    <li onclick="mostrarInfo('azulejos')">Azulejos y vajillas</li>
+                    <li onclick="mostrarInfo('barroca')">Iconografía barroca</li>
+                    <li onclick="mostrarInfo('coccion')">Proceso de cocción y esmalte</li>
                 </ul>
             </div>
             <div class="sala-visual">
@@ -768,9 +775,9 @@
         <div class="sala-grid">
             <div>
                 <ul class="exhibits-list">
-                    <li>Traje de charro</li>
-                    <li>Huipil y rebozo</li>
-                    <li>Vestidos de fiesta regionales</li>
+                    <li onclick="mostrarInfo('charro')">Traje de charro</li>
+                    <li onclick="mostrarInfo('huipil')">Huipil y rebozo</li>
+                    <li onclick="mostrarInfo('vestidos')">Vestidos de fiesta regionales</li>
                 </ul>
             </div>
             <div class="sala-visual">
@@ -790,9 +797,9 @@
         <div class="sala-grid">
             <div>
                 <ul class="exhibits-list">
-                    <li>Orígenes del mariachi</li>
-                    <li>Instrumentos tradicionales</li>
-                    <li>Canciones emblemáticas</li>
+                    <li onclick="mostrarInfo('origenMariachi')">Orígenes del mariachi</li>
+                    <li onclick="mostrarInfo('instrumentos')">Instrumentos tradicionales</li>
+                    <li onclick="mostrarInfo('canciones')">Canciones emblemáticas</li>
                 </ul>
             </div>
             <div class="sala-visual">
@@ -812,9 +819,9 @@
         <div class="sala-grid">
             <div>
                 <ul class="exhibits-list">
-                    <li>Mole poblano</li>
-                    <li>Chiles y maíz</li>
-                    <li>Postres tradicionales</li>
+                    <li onclick="mostrarInfo('mole')">Mole poblano</li>
+                    <li onclick="mostrarInfo('maiz')">Chiles y maíz</li>
+                    <li onclick="mostrarInfo('postres')">Postres tradicionales</li>
                 </ul>
             </div>
             <div class="sala-visual">
@@ -884,6 +891,50 @@
         galeria.style.display = 'block';
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+
+const informacion={
+cholula:{titulo:"La Gran Pirámide de Cholula",imagen:"Piramide del sol.jpg",texto:"Ubicada en Puebla, es la pirámide con mayor volumen del mundo y una de las construcciones más impresionantes de Mesoamérica."},
+kukulkan:{titulo:"Templo de Kukulkán",imagen:"Piramide del sol.jpg",texto:"Pirámide principal de Chichén Itzá. Durante los equinoccios se observa el efecto visual de la serpiente descendiendo por sus escalinatas."},
+escalinatas:{titulo:"Las Escalinatas Sagradas",imagen:"Piramide del sol.jpg",texto:"Las escalinatas conectaban plazas y templos donde se realizaban ceremonias religiosas."},
+cincoSoles:{titulo:"El ciclo de los cinco soles",imagen:"Piedradelsol.webp",texto:"La cosmovisión mexica explica cinco eras o soles que representan distintas etapas de la humanidad."},
+glifos:{titulo:"Los glifos y su significado",imagen:"Piedradelsol.webp",texto:"Los glifos representan días, deidades, fenómenos naturales y ciclos calendáricos."},
+tenochtitlan:{titulo:"México-Tenochtitlán",imagen:"Piedradelsol.webp",texto:"Los mexicas utilizaban avanzados calendarios para organizar la vida social y religiosa."},
+alebrijes:{titulo:"Alebrijes de Oaxaca",imagen:"Artesanias.webp",texto:"Figuras fantásticas llenas de color que mezclan características de distintos animales."},
+textiles:{titulo:"Textiles Chiapanecos",imagen:"Artesanias.webp",texto:"Piezas elaboradas en telar con diseños tradicionales transmitidos por generaciones."},
+barroNegro:{titulo:"Barro Negro",imagen:"Artesanias.webp",texto:"Artesanía oaxaqueña reconocida por su color oscuro brillante y elegancia."},
+azulejos:{titulo:"Azulejos y Vajillas",imagen:"talavera.jpg",texto:"La Talavera poblana destaca por sus diseños decorativos elaborados a mano."},
+barroca:{titulo:"Iconografía Barroca",imagen:"talavera.jpg",texto:"La cerámica incorpora elementos del arte barroco novohispano."},
+coccion:{titulo:"Proceso de Cocción",imagen:"talavera.jpg",texto:"La Talavera requiere varias etapas de modelado, esmaltado y horneado."},
+charro:{titulo:"Traje de Charro",imagen:"trajes.jpg",texto:"Símbolo nacional mexicano asociado a la charrería y al mariachi."},
+huipil:{titulo:"Huipil y Rebozo",imagen:"trajes.jpg",texto:"Prendas tradicionales que reflejan identidad cultural y herencia indígena."},
+vestidos:{titulo:"Vestidos Regionales",imagen:"trajes.jpg",texto:"Cada estado de México posee vestimentas típicas con diseños únicos."},
+origenMariachi:{titulo:"Orígenes del Mariachi",imagen:"mariachi.jpg",texto:"El mariachi surgió en el occidente de México y es Patrimonio Cultural Inmaterial de la Humanidad."},
+instrumentos:{titulo:"Instrumentos Tradicionales",imagen:"mariachi.jpg",texto:"Violines, trompetas, vihuela, guitarra y guitarrón forman el conjunto tradicional."},
+canciones:{titulo:"Canciones Emblemáticas",imagen:"mariachi.jpg",texto:"Incluye clásicos como El Son de la Negra y Cielito Lindo."},
+mole:{titulo:"Mole Poblano",imagen:"comida.webp",texto:"Uno de los platillos más representativos de la cocina mexicana."},
+maiz:{titulo:"Chiles y Maíz",imagen:"comida.webp",texto:"Ingredientes fundamentales en la alimentación mexicana desde la época prehispánica."},
+postres:{titulo:"Postres Tradicionales",imagen:"comida.webp",texto:"Dulces típicos elaborados con recetas heredadas por generaciones."}
+};
+
+function mostrarInfo(id){
+document.getElementById('modalTitulo').innerText=informacion[id].titulo;
+document.getElementById('modalImagen').src=informacion[id].imagen;
+document.getElementById('modalTexto').innerText=informacion[id].texto;
+document.getElementById('modalInfo').style.display='block';
+}
+function cerrarModal(){document.getElementById('modalInfo').style.display='none';}
+window.onclick=function(e){let m=document.getElementById('modalInfo');if(e.target===m){m.style.display='none';}};
+
 </script>
+
+<div id="modalInfo" class="modal">
+<div class="modal-content">
+<span class="cerrar-modal" onclick="cerrarModal()">&times;</span>
+<h2 id="modalTitulo"></h2>
+<img id="modalImagen" class="modal-img" src="">
+<p id="modalTexto"></p>
+</div>
+</div>
+
 </body>
 </html>
