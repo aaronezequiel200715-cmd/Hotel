@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador Aleatorio de Chistes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .joke-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .joke-box.loading {
+            background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+            color: #667eea;
+        }
+
+        .joke-box.loading::after {
+            content: '';
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            min-width: 150px;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .btn-joke {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-joke:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-joke:active {
+            transform: translateY(0);
+        }
+
+        .btn-joke:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-copy {
+            background: #f0f0f0;
+            color: #333;
+            border: 2px solid #667eea;
+        }
+
+        .btn-copy:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .joke-type {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 10px;
+        }
+
+        .joke-type label {
+            display: inline-block;
+            margin: 10px 20px 10px 0;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .joke-type input[type="radio"] {
+            margin-right: 8px;
+            cursor: pointer;
+        }
+
+        .info {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #999;
+        }
+
+        .success-message {
+            color: #667eea;
+            margin-top: 10px;
+            font-weight: bold;
+            display: none;
+        }
+
+        .error-message {
+            color: #e74c3c;
+            margin-top: 10px;
+            font-weight: bold;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>😂 Generador de Chistes</h1>
+        <p class="subtitle">¡Obtén un chiste aleatorio para reír!</p>
+
+        <div class="joke-type">
+            <label>
+                <input type="radio" name="jokeType" value="general" checked>
+                General
+            </label>
+            <label>
+                <input type="radio" name="jokeType" value="programming">
+                Programación
+            </label>
+        </div>
+
+        <div class="joke-box" id="jokeBox">
+            Haz clic en el botón para obtener un chiste...
+        </div>
+
+        <div class="error-message" id="errorMessage"></div>
+        <div class="success-message" id="successMessage">¡Copiado al portapapeles!</div>
+
+        <div class="button-group">
+            <button class="btn-joke" id="getJokeBtn" onclick="getJoke()">Nuevo Chiste</button>
+            <button class="btn-copy" id="copyBtn" onclick="copyJoke()">Copiar</button>
+        </div>
+
+        <p class="info">Powered by <strong>JokeAPI</strong></p>
+    </div>
+
+    <script>
+        let currentJoke = '';
+
+        async function getJoke() {
+            const jokeBox = document.getElementById('jokeBox');
+            const getJokeBtn = document.getElementById('getJokeBtn');
+            const jokeType = document.querySelector('input[name="jokeType"]:checked').value;
+            const errorMessage = document.getElementById('errorMessage');
+            const successMessage = document.getElementById('successMessage');
+
+            // Resetear mensajes
+            errorMessage.style.display = 'none';
+            successMessage.style.display = 'none';
+
+            // Mostrar estado de carga
+            jokeBox.classList.add('loading');
+            jokeBox.textContent = 'Cargando chiste...';
+            getJokeBtn.disabled = true;
+
+            try {
+                let apiUrl;
+
+                if (jokeType === 'programming') {
+                    // API de chistes de programación
+                    apiUrl = 'https://official-joke-api.appspot.com/jokes/programming/random';
+                } else {
+                    // API de chistes generales
+                    apiUrl = 'https://official-joke-api.appspot.com/random_joke';
+                }
+
+                const response = await fetch(apiUrl);
+
+                if (!response.ok) {
+                    throw new Error(`Error en la API: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                // Formatear el chiste
+                if (Array.isArray(data)) {
+                    // Si es un array, tomar el primer elemento
+                    currentJoke = `${data[0].setup}\n\n${data[0].punchline}`;
+                } else {
+                    // Si es un objeto único
+                    currentJoke = `${data.setup}\n\n${data.punchline}`;
+                }
+
+                // Mostrar el chiste
+                jokeBox.classList.remove('loading');
+                jokeBox.textContent = currentJoke;
+
+            } catch (error) {
+                console.error('Error:', error);
+                jokeBox.classList.remove('loading');
+                jokeBox.textContent = '¡Oops! No pudimos obtener un chiste. Intenta de nuevo.';
+                errorMessage.textContent = `Error: ${error.message}`;
+                errorMessage.style.display = 'block';
+            } finally {
+                getJokeBtn.disabled = false;
+            }
+        }
+
+        function copyJoke() {
+            const successMessage = document.getElementById('successMessage');
+
+            if (!currentJoke) {
+                alert('Primero obtén un chiste para copiar');
+                return;
+            }
+
+            navigator.clipboard.writeText(currentJoke).then(() => {
+                successMessage.style.display = 'block';
+                setTimeout(() => {
+                    successMessage.style.display = 'none';
+                }, 2000);
+            }).catch(err => {
+                console.error('Error al copiar:', err);
+                alert('No pudimos copiar el chiste');
+            });
+        }
+
+        // Obtener un chiste al cargar la página
+        window.addEventListener('load', () => {
+            getJoke();
+        });
+
+        // Permitir Enter para obtener nuevo chiste
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                getJoke();
+            }
+        });
+    </script>
+</body>
+</html>
